@@ -1,4 +1,10 @@
-function StatsRadar({ stats }) {
+import type { Stat } from "../data/character";
+
+interface StatsRadarProps {
+    stats: Stat[];
+}
+
+function StatsRadar({ stats }: StatsRadarProps) {
     const size = 500;
     const center = size / 2;
     const radius = 150;
@@ -6,7 +12,7 @@ function StatsRadar({ stats }) {
 
     const angleStep = (Math.PI * 2) / stats.length;
 
-    function getCoordinates(value, index, maxValue = 10, distance = radius) {
+    function getCoordinates(value: number, index: number, maxValue = 10, distance = radius) {
         const angle = index * angleStep - Math.PI / 2;
 
         const currentRadius = (value / maxValue) * distance;
@@ -40,9 +46,12 @@ function StatsRadar({ stats }) {
         <div className="stats-radar">
 
             <svg
-                width={size}
-                height={size}
+                width="100%"
                 viewBox={`0 0 ${size} ${size}`}
+                role="img"
+                aria-label={`Gráfico de radar de estadísticas: ${stats
+                    .map((stat) => `${stat.name} ${stat.value} de ${stat.maxValue}`)
+                    .join(", ")}`}
             >
 
                 {/* Líneas desde el centro */}
@@ -106,7 +115,7 @@ function StatsRadar({ stats }) {
                         labelRadius
                     );
 
-                    let textAnchor = "middle";
+                    let textAnchor: "middle" | "end" | "start" = "middle";
 
                     if (x < center - 20) {
                         textAnchor = "end";
@@ -131,19 +140,6 @@ function StatsRadar({ stats }) {
                         </text>
                     );
                 })}
-
-                {/* Valor central */}
-                <text
-                    x={center}
-                    y={center}
-                    textAnchor="middle"
-                    dominantBaseline="middle"
-                    fill="#ffffff"
-                    fontSize="18"
-                    fontWeight="700"
-                >
-                    
-                </text>
 
             </svg>
 

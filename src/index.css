@@ -1,8 +1,81 @@
-:root {
-    font-family: Inter, system-ui, sans-serif;
+/* =========================================================
+   XYRON — Design tokens
+   ========================================================= */
 
-    color: #f5f5f5;
-    background: #09090c;
+:root {
+    /* Color — superficies con profundidad, no negro puro */
+    --color-bg: #08070c;
+    --color-bg-elevated: #100e17;
+    --color-surface: #15121d;
+    --color-surface-elevated: #1c1826;
+    --color-border: #2a2536;
+    --color-border-strong: #3a3450;
+
+    --color-primary: #9b5cff;
+    --color-primary-hover: #ab77ff;
+    --color-primary-soft: rgba(155, 92, 255, 0.14);
+
+    --color-success: #3ddc84;
+    --color-warning: #ffb84d;
+    --color-danger: #ff6b6b;
+
+    --color-text: #f3f1f8;
+    --color-text-muted: #9c96ad;
+    --color-text-faint: #6b6579;
+
+    --color-xp: #9b5cff;
+    --color-coins: #f5c542;
+
+    /* Dificultad de misiones */
+    --color-easy: #3ddc84;
+    --color-medium: #5cc8ff;
+    --color-hard: #ff9b4d;
+    --color-epic: #ff5cf0;
+
+    /* Tipografía */
+    --font-display: "Sora", "Inter", system-ui, sans-serif;
+    --font-body: "Inter", system-ui, sans-serif;
+
+    --text-caption: 11px;
+    --text-small: 13px;
+    --text-body: 15px;
+    --text-h3: 17px;
+    --text-h2: 22px;
+    --text-h1: 28px;
+    --text-display: 36px;
+
+    /* Espaciado */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 24px;
+    --space-6: 32px;
+    --space-7: 48px;
+    --space-8: 64px;
+
+    /* Bordes y sombras */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --radius-pill: 999px;
+
+    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.25);
+    --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.45);
+    --shadow-glow-primary: 0 0 0 1px rgba(155, 92, 255, 0.4), 0 0 24px rgba(155, 92, 255, 0.25);
+
+    /* Movimiento */
+    --duration-fast: 120ms;
+    --duration-base: 200ms;
+    --duration-slow: 360ms;
+    --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+    color-scheme: dark;
+    font-family: var(--font-body);
+    color: var(--color-text);
+    background: var(--color-bg);
 
     font-synthesis: none;
     text-rendering: optimizeLegibility;
@@ -16,8 +89,658 @@ body {
     margin: 0;
     min-width: 320px;
     min-height: 100vh;
+    background: var(--color-bg);
 }
 
-button {
+h1, h2, h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1.2;
+    margin: 0;
+}
+
+h1 {
+    font-size: var(--text-h1);
+}
+
+h2 {
+    font-size: var(--text-h2);
+}
+
+h3 {
+    font-size: var(--text-h3);
+}
+
+.eyebrow {
+    font-family: var(--font-display);
+    font-size: var(--text-caption);
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+}
+
+.text-muted {
+    color: var(--color-text-muted);
+}
+
+a {
+    color: var(--color-primary);
+}
+
+/* =========================================================
+   Formularios base
+   ========================================================= */
+
+button,
+input,
+select,
+textarea {
     font: inherit;
+    color: inherit;
+}
+
+input,
+select,
+textarea {
+    padding: 10px 12px;
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+
+    background: var(--color-bg-elevated);
+
+    transition: border-color var(--duration-fast) var(--ease-standard);
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: var(--color-text-faint);
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+button:focus-visible,
+a:focus-visible,
+[tabindex]:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* =========================================================
+   Button (src/components/ui/Button.tsx)
+   ========================================================= */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+
+    padding: 10px 18px;
+
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+
+    font-family: var(--font-display);
+    font-size: var(--text-small);
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+
+    cursor: pointer;
+    transition: background-color var(--duration-fast) var(--ease-standard),
+        border-color var(--duration-fast) var(--ease-standard),
+        transform var(--duration-fast) var(--ease-standard),
+        opacity var(--duration-fast) var(--ease-standard);
+}
+
+.btn:active:not(:disabled) {
+    transform: scale(0.97);
+}
+
+.btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.btn--sm {
+    padding: 6px 12px;
+    font-size: var(--text-caption);
+}
+
+.btn--icon {
+    padding: 8px;
+    aspect-ratio: 1;
+}
+
+.btn--primary {
+    border-color: transparent;
+    background: linear-gradient(135deg, var(--color-primary), #7c3aed);
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(155, 92, 255, 0.25);
+}
+
+.btn--primary:hover:not(:disabled) {
+    background: linear-gradient(135deg, var(--color-primary-hover), #8b4cf0);
+}
+
+.btn--secondary {
+    border-color: var(--color-border-strong);
+    background: var(--color-surface-elevated);
+    color: var(--color-text);
+}
+
+.btn--secondary:hover:not(:disabled) {
+    border-color: var(--color-primary);
+    background: var(--color-primary-soft);
+}
+
+.btn--ghost {
+    border-color: transparent;
+    background: transparent;
+    color: var(--color-text-muted);
+}
+
+.btn--ghost:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--color-text);
+}
+
+.btn--danger {
+    border-color: rgba(255, 107, 107, 0.35);
+    background: rgba(255, 107, 107, 0.08);
+    color: var(--color-danger);
+}
+
+.btn--danger:hover:not(:disabled) {
+    background: rgba(255, 107, 107, 0.16);
+}
+
+.btn--success {
+    border-color: transparent;
+    background: linear-gradient(135deg, var(--color-success), #22a35a);
+    color: #06170d;
+}
+
+.btn--premium {
+    border-color: rgba(245, 197, 66, 0.5);
+    background: linear-gradient(135deg, #f5c542, #ff9b4d);
+    color: #221400;
+    box-shadow: 0 8px 20px rgba(245, 197, 66, 0.25);
+}
+
+.btn--loading {
+    color: transparent !important;
+    pointer-events: none;
+}
+
+.btn-spinner {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #fff;
+    border-radius: 50%;
+
+    animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* =========================================================
+   Badge (src/components/ui/Badge.tsx)
+   ========================================================= */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+
+    padding: 3px 10px;
+    border-radius: var(--radius-pill);
+
+    font-family: var(--font-display);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--color-text-muted);
+    border: 1px solid transparent;
+}
+
+.badge--primary {
+    background: var(--color-primary-soft);
+    color: var(--color-primary-hover);
+    border-color: rgba(155, 92, 255, 0.35);
+}
+
+.badge--success {
+    background: rgba(61, 220, 132, 0.12);
+    color: var(--color-success);
+    border-color: rgba(61, 220, 132, 0.3);
+}
+
+.badge--easy {
+    background: rgba(61, 220, 132, 0.12);
+    color: var(--color-easy);
+}
+
+.badge--medium {
+    background: rgba(92, 200, 255, 0.12);
+    color: var(--color-medium);
+}
+
+.badge--hard {
+    background: rgba(255, 155, 77, 0.14);
+    color: var(--color-hard);
+}
+
+.badge--epic {
+    background: rgba(255, 92, 240, 0.14);
+    color: var(--color-epic);
+}
+
+/* =========================================================
+   ProgressBar (src/components/ui/ProgressBar.tsx)
+   ========================================================= */
+
+.progress-bar {
+    height: 10px;
+    border-radius: var(--radius-pill);
+    background: rgba(255, 255, 255, 0.07);
+    overflow: hidden;
+}
+
+.progress-bar--lg {
+    height: 14px;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    border-radius: var(--radius-pill);
+    background: linear-gradient(90deg, var(--color-primary), #c793ff);
+    transition: width var(--duration-slow) var(--ease-standard);
+}
+
+.progress-bar-fill--xp {
+    background: linear-gradient(90deg, var(--color-xp), #c793ff);
+}
+
+.progress-bar-fill--coins {
+    background: linear-gradient(90deg, #d9a520, var(--color-coins));
+}
+
+/* =========================================================
+   Card genérica
+   ========================================================= */
+
+.card {
+    padding: var(--space-5);
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+
+    background: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+}
+
+/* =========================================================
+   Modal (src/components/ui/Modal.tsx)
+   ========================================================= */
+
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: var(--space-5);
+
+    background: rgba(5, 4, 8, 0.72);
+    backdrop-filter: blur(6px);
+
+    animation: modal-backdrop-in var(--duration-base) var(--ease-standard);
+}
+
+@keyframes modal-backdrop-in {
+    from {
+        opacity: 0;
+    }
+}
+
+.modal-card {
+    width: 100%;
+    max-width: 440px;
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+
+    padding: var(--space-5);
+
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-lg);
+
+    background: var(--color-surface-elevated);
+    box-shadow: var(--shadow-lg);
+
+    animation: modal-card-in var(--duration-base) var(--ease-standard);
+}
+
+@keyframes modal-card-in {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98);
+    }
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+
+    margin-bottom: var(--space-4);
+}
+
+.modal-header h2 {
+    font-size: var(--text-h2);
+}
+
+/* =========================================================
+   Toast (src/components/ui/Toast.tsx)
+   ========================================================= */
+
+.toast-stack {
+    position: fixed;
+    right: var(--space-5);
+    bottom: var(--space-5);
+    z-index: 300;
+
+    display: flex;
+    flex-direction: column-reverse;
+    gap: var(--space-2);
+
+    width: min(320px, calc(100vw - 32px));
+}
+
+.toast {
+    padding: var(--space-4);
+
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-md);
+
+    background: var(--color-surface-elevated);
+    box-shadow: var(--shadow-lg);
+
+    animation: toast-in var(--duration-base) var(--ease-standard);
+}
+
+.toast--exiting {
+    animation: toast-out var(--duration-base) var(--ease-standard) forwards;
+}
+
+@keyframes toast-in {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.96);
+    }
+}
+
+@keyframes toast-out {
+    to {
+        opacity: 0;
+        transform: translateX(24px);
+    }
+}
+
+.toast-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    margin: 0 0 6px;
+
+    font-family: var(--font-display);
+    font-size: var(--text-caption);
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--color-primary-hover);
+}
+
+.toast--levelup .toast-title {
+    color: var(--color-warning);
+}
+
+.toast--achievement .toast-title {
+    color: var(--color-coins);
+}
+
+.toast-line {
+    margin: 0;
+    font-size: var(--text-body);
+    font-weight: 600;
+}
+
+.toast-sub {
+    margin: 4px 0 0;
+    font-size: var(--text-small);
+    color: var(--color-text-muted);
+}
+
+/* =========================================================
+   Skeleton (src/components/ui/Skeleton.tsx)
+   ========================================================= */
+
+.skeleton {
+    position: relative;
+    overflow: hidden;
+
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-elevated);
+}
+
+.skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
+    animation: skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes skeleton-shimmer {
+    from {
+        transform: translateX(-100%);
+    }
+
+    to {
+        transform: translateX(100%);
+    }
+}
+
+/* =========================================================
+   EmptyState (src/components/ui/EmptyState.tsx)
+   ========================================================= */
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+
+    padding: var(--space-6) var(--space-4);
+
+    border: 1px dashed var(--color-border-strong);
+    border-radius: var(--radius-md);
+
+    text-align: center;
+}
+
+.empty-state-icon {
+    font-size: 32px;
+    line-height: 1;
+    margin-bottom: var(--space-1);
+    opacity: 0.8;
+}
+
+.empty-state h3 {
+    font-size: var(--text-h3);
+}
+
+.empty-state p {
+    margin: 0;
+    max-width: 320px;
+    color: var(--color-text-muted);
+    font-size: var(--text-small);
+}
+
+/* =========================================================
+   Animaciones de entrada compartidas
+   ========================================================= */
+
+@keyframes fade-slide-up {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+}
+
+.animate-in {
+    animation: fade-slide-up var(--duration-base) var(--ease-standard) both;
+}
+
+/* =========================================================
+   Auth pages (login / signup / forgot / reset)
+   ========================================================= */
+
+.auth-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 100vh;
+    padding: var(--space-5);
+
+    background:
+        radial-gradient(circle at top, #211a35 0%, #100e17 45%, #08070c 100%);
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 380px;
+    padding: var(--space-6);
+
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+
+    background: rgba(21, 18, 29, 0.85);
+    box-shadow: var(--shadow-lg);
+
+    text-align: center;
+}
+
+.auth-logo {
+    margin: 0 0 4px;
+    font-family: var(--font-display);
+    font-size: var(--text-h1);
+    letter-spacing: 4px;
+}
+
+.auth-subtitle {
+    margin: 0 0 var(--space-5);
+    color: var(--color-text-muted);
+    font-size: var(--text-small);
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+
+    text-align: left;
+}
+
+.auth-submit {
+    width: 100%;
+    margin-top: 4px;
+}
+
+.auth-error {
+    margin: 0;
+    color: var(--color-danger);
+    font-size: var(--text-small);
+}
+
+.auth-info {
+    margin: 0 0 var(--space-4);
+    color: var(--color-primary-hover);
+    font-size: var(--text-small);
+}
+
+.auth-divider {
+    margin: var(--space-5) 0 var(--space-3);
+    color: var(--color-text-faint);
+    font-size: var(--text-caption);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.auth-oauth {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.auth-oauth .btn {
+    flex: 1;
+}
+
+.auth-links {
+    margin: var(--space-4) 0 0;
+    color: var(--color-text-muted);
+    font-size: var(--text-small);
+}
+
+.auth-notice {
+    margin-bottom: var(--space-5);
+    padding: var(--space-3);
+
+    border: 1px solid var(--color-warning);
+    border-radius: var(--radius-sm);
+
+    background: rgba(255, 184, 77, 0.08);
+
+    font-size: var(--text-caption);
+    text-align: left;
+}
+
+.auth-notice code {
+    color: var(--color-warning);
+}
+
+.auth-loading {
+    color: var(--color-text-muted);
 }
