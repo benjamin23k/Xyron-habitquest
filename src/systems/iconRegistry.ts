@@ -21,7 +21,9 @@ import {
     Trophy,
     Fire,
     Lightning,
-    Compass
+    Compass,
+    Crown,
+    Sparkle
 } from "@phosphor-icons/react";
 
 // Registro central de iconos: mapea claves de string (persistidas en Supabase
@@ -51,7 +53,9 @@ export const ICON_REGISTRY: Record<string, Icon> = {
     Trophy,
     Fire,
     Lightning,
-    Compass
+    Compass,
+    Crown,
+    Sparkle
 };
 
 export function resolveIcon(key: string): Icon | undefined {

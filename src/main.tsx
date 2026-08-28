@@ -12,9 +12,14 @@ import ResetPasswordPage from './components/auth/ResetPasswordPage.tsx'
 import AppLayout from './components/layout/AppLayout.tsx'
 import DashboardPage from './pages/DashboardPage.tsx'
 import MissionsPage from './pages/MissionsPage.tsx'
+import HabitsPage from './pages/HabitsPage.tsx'
 import AttributesPage from './pages/AttributesPage.tsx'
+import SkillTreePage from './pages/SkillTreePage.tsx'
+import FocusPage from './pages/FocusPage.tsx'
 import CalendarPage from './pages/CalendarPage.tsx'
 import AchievementsPage from './pages/AchievementsPage.tsx'
+import AnalyticsPage from './pages/AnalyticsPage.tsx'
+import JournalPage from './pages/JournalPage.tsx'
 import ProfilePage from './pages/ProfilePage.tsx'
 import SettingsPage from './pages/SettingsPage.tsx'
 
@@ -43,9 +48,14 @@ createRoot(rootElement).render(
             >
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/missions" element={<MissionsPage />} />
+              <Route path="/habits" element={<HabitsPage />} />
               <Route path="/attributes" element={<AttributesPage />} />
+              <Route path="/skills" element={<SkillTreePage />} />
+              <Route path="/focus" element={<FocusPage />} />
               <Route path="/calendar" element={<CalendarPage />} />
               <Route path="/achievements" element={<AchievementsPage />} />
+              <Route path="/analytics" element={<AnalyticsPage />} />
+              <Route path="/journal" element={<JournalPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/settings" element={<SettingsPage />} />
             </Route>

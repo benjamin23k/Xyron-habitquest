@@ -1,9 +1,9 @@
 import { createContext, useCallback, useContext, useState } from "react";
 import type { ReactNode } from "react";
-import { CheckCircle, TrendUp, Trophy, Coins as CoinsIcon, Info } from "@phosphor-icons/react";
+import { CheckCircle, TrendUp, Trophy, Coins as CoinsIcon, Info, Crown, Repeat } from "@phosphor-icons/react";
 import type { Icon } from "@phosphor-icons/react";
 
-export type ToastKind = "mission" | "levelup" | "achievement" | "coins" | "info";
+export type ToastKind = "mission" | "habit" | "levelup" | "achievement" | "coins" | "info" | "title";
 
 export interface ToastInput {
     kind: ToastKind;
@@ -25,18 +25,22 @@ const TOAST_DURATION_MS = 3400;
 
 const TOAST_ICONS: Record<ToastKind, Icon> = {
     mission: CheckCircle,
+    habit: Repeat,
     levelup: TrendUp,
     achievement: Trophy,
     coins: CoinsIcon,
-    info: Info
+    info: Info,
+    title: Crown
 };
 
 const TOAST_LABELS: Record<ToastKind, string> = {
     mission: "Misión completa",
+    habit: "Hábito completado",
     levelup: "¡Subiste de nivel!",
     achievement: "Logro desbloqueado",
     coins: "Monedas",
-    info: "Aviso"
+    info: "Aviso",
+    title: "Título desbloqueado"
 };
 
 export function ToastProvider({ children }: { children: ReactNode }) {

@@ -14,7 +14,10 @@ export async function signUpWithEmail(email: string, password: string, name: str
         email,
         password,
         options: {
-            data: { name }
+            // timezone_offset_minutes viaja desde acá hasta handle_new_user()
+            // en Supabase, para que "hoy" en el reinicio diario de misiones se
+            // evalúe en la zona horaria real del usuario y no en UTC.
+            data: { name, timezone_offset_minutes: new Date().getTimezoneOffset() }
         }
     });
 

@@ -361,6 +361,29 @@ a:focus-visible,
     color: var(--color-epic);
 }
 
+/* Rareza (achievements/titles) — "epic" reutiliza el color de dificultad de
+   arriba a propósito, misma jerarquía visual en toda la app. */
+.badge--common {
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--color-text-muted);
+}
+
+.badge--rare {
+    background: rgba(92, 200, 255, 0.12);
+    color: var(--color-medium);
+}
+
+.badge--legendary {
+    background: rgba(245, 197, 66, 0.14);
+    color: var(--color-coins);
+}
+
+.badge--mythic {
+    background: linear-gradient(135deg, rgba(155, 92, 255, 0.18), rgba(255, 92, 240, 0.18));
+    color: #ff9bf5;
+    border-color: rgba(255, 92, 240, 0.35);
+}
+
 /* =========================================================
    ProgressBar (src/components/ui/ProgressBar.tsx)
    ========================================================= */
@@ -537,6 +560,10 @@ a:focus-visible,
 
 .toast--achievement .toast-title {
     color: var(--color-coins);
+}
+
+.toast--title .toast-title {
+    color: var(--color-primary-hover);
 }
 
 .toast-line {

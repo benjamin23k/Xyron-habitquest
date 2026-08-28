@@ -1,16 +1,25 @@
 import { useState } from "react";
 import Modal from "./Modal";
 import Button from "./ui/Button";
+import type { ButtonVariant } from "./ui/Button";
 
 interface ConfirmModalProps {
     title: string;
     description: string;
     confirmLabel: string;
+    confirmVariant?: ButtonVariant;
     onConfirm: () => Promise<void> | void;
     onClose: () => void;
 }
 
-function ConfirmModal({ title, description, confirmLabel, onConfirm, onClose }: ConfirmModalProps) {
+function ConfirmModal({
+    title,
+    description,
+    confirmLabel,
+    confirmVariant = "danger",
+    onConfirm,
+    onClose
+}: ConfirmModalProps) {
     const [error, setError] = useState<string | null>(null);
     const [submitting, setSubmitting] = useState(false);
 
@@ -41,7 +50,7 @@ function ConfirmModal({ title, description, confirmLabel, onConfirm, onClose }: 
                 <Button type="button" variant="secondary" onClick={onClose} disabled={submitting}>
                     Cancelar
                 </Button>
-                <Button type="button" variant="danger" onClick={handleConfirm} loading={submitting}>
+                <Button type="button" variant={confirmVariant} onClick={handleConfirm} loading={submitting}>
                     {confirmLabel}
                 </Button>
             </div>

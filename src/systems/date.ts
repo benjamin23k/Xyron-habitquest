@@ -12,3 +12,14 @@ export function daysBetween(fromKey: string, toKey: string): number {
 
     return Math.round((to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24));
 }
+
+// Lunes de la semana calendario (local) de `date`, a medianoche — mismo
+// criterio que systems/calendar.ts (semana arranca en lunes).
+export function startOfWeek(date: Date): number {
+    const result = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const day = result.getDay();
+    const diffToMonday = day === 0 ? -6 : 1 - day;
+
+    result.setDate(result.getDate() + diffToMonday);
+    return result.getTime();
+}

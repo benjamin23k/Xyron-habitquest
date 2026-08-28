@@ -1,4 +1,4 @@
-import { Coins, X } from "@phosphor-icons/react";
+import { CalendarBlank, Coins, Timer, X } from "@phosphor-icons/react";
 import type { Quest } from "../../data/quests";
 import type { BadgeVariant } from "../ui/Badge";
 import Badge from "../ui/Badge";
@@ -14,10 +14,31 @@ interface MissionCardProps {
 
 const DIFFICULTY_LABEL: Record<Quest["difficulty"], string> = {
     easy: "Easy",
-    medium: "Medium",
+    medium: "Normal",
     hard: "Hard",
-    epic: "Epic"
+    epic: "Epic",
+    legendary: "Legendary"
 };
+
+const FREQUENCY_LABEL: Record<Quest["frequency"], string> = {
+    daily: "Diaria",
+    weekly: "Semanal",
+    monthly: "Mensual",
+    once: "Única vez",
+    challenge: "Challenge"
+};
+
+const COMPLETED_LABEL: Record<Quest["frequency"], string> = {
+    daily: "Completada hoy",
+    weekly: "Completada esta semana",
+    monthly: "Completada este mes",
+    once: "Completada",
+    challenge: "Completada"
+};
+
+function formatDueDate(dueDate: string): string {
+    return new Date(dueDate).toLocaleDateString("es-ES", { day: "numeric", month: "short" });
+}
 
 function MissionCard({ quest, kind, isCompleted, onComplete, onRemove }: MissionCardProps) {
     const badgeVariant = quest.difficulty as BadgeVariant;
@@ -32,6 +53,22 @@ function MissionCard({ quest, kind, isCompleted, onComplete, onRemove }: Mission
             <h3 className="mission-card-title">{quest.title}</h3>
 
             {quest.description && <p className="mission-card-description">{quest.description}</p>}
+
+            {kind === "custom" && (
+                <div className="mission-card-meta">
+                    <Badge>{FREQUENCY_LABEL[quest.frequency]}</Badge>
+                    {quest.estimatedMinutes != null && (
+                        <span className="mission-card-meta-item">
+                            <Timer size={13} aria-hidden="true" /> {quest.estimatedMinutes} min
+                        </span>
+                    )}
+                    {quest.dueDate && (
+                        <span className="mission-card-meta-item">
+                            <CalendarBlank size={13} aria-hidden="true" /> {formatDueDate(quest.dueDate)}
+                        </span>
+                    )}
+                </div>
+            )}
 
             <div className="mission-card-rewards">
                 <span className="mission-reward mission-reward--xp">+{quest.xpReward} XP</span>
@@ -51,7 +88,7 @@ function MissionCard({ quest, kind, isCompleted, onComplete, onRemove }: Mission
                     disabled={isCompleted}
                     aria-pressed={isCompleted}
                 >
-                    {isCompleted ? "Completada hoy" : "Completar"}
+                    {isCompleted ? COMPLETED_LABEL[quest.frequency] : "Completar"}
                 </Button>
 
                 {onRemove && (

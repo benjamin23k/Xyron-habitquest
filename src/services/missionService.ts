@@ -1,18 +1,22 @@
 import { supabase } from "../lib/supabaseClient";
 
+export type MissionDifficulty = "easy" | "medium" | "hard" | "epic" | "legendary";
+export type MissionFrequency = "daily" | "weekly" | "monthly" | "once" | "challenge";
+
 export interface Mission {
     id: string;
     owner_user_id: string | null;
     title: string;
     description: string | null;
-    difficulty: "easy" | "medium" | "hard" | "epic";
+    difficulty: MissionDifficulty;
     category: string | null;
     stat: string | null;
     stat_reward: number;
     xp_reward: number;
     coin_reward: number;
-    frequency: "daily" | "once";
+    frequency: MissionFrequency;
     due_date: string | null;
+    estimated_minutes: number | null;
     status: string;
     created_at: string;
 }
@@ -88,16 +92,36 @@ export async function completeMission(missionId: string): Promise<CompleteMissio
     return data as CompleteMissionResult;
 }
 
-export async function createCustomMission(
-    ownerUserId: string,
-    title: string,
-    stat: string
-): Promise<Mission> {
+export interface NewMissionInput {
+    title: string;
+    description: string;
+    category: string;
+    stat: string;
+    difficulty: MissionDifficulty;
+    frequency: MissionFrequency;
+    dueDate: string | null;
+    estimatedMinutes: number | null;
+}
+
+export async function createCustomMission(ownerUserId: string, input: NewMissionInput): Promise<Mission> {
     const client = requireClient();
 
+    // xp_reward/coin_reward no se mandan: no tienen privilegio de columna
+    // (los fija el trigger fn_apply_difficulty_rewards a partir de la
+    // dificultad elegida — ver supabase/migrations/0007_quest_system_upgrade.sql).
     const { data, error } = await client
         .from("missions")
-        .insert({ owner_user_id: ownerUserId, title, stat })
+        .insert({
+            owner_user_id: ownerUserId,
+            title: input.title,
+            description: input.description || null,
+            category: input.category || null,
+            stat: input.stat,
+            difficulty: input.difficulty,
+            frequency: input.frequency,
+            due_date: input.dueDate,
+            estimated_minutes: input.estimatedMinutes
+        })
         .select("*")
         .single();
 

@@ -2,17 +2,34 @@ import { Link } from "react-router-dom";
 import { List, Fire } from "@phosphor-icons/react";
 import CoinBalance from "../ui/CoinBalance";
 import Button from "../ui/Button";
+import NotificationBell from "./NotificationBell";
+import type { NotificationRow } from "../../services/notificationService";
 
 interface TopbarProps {
     level: number;
     streakDays: number;
     coins: number;
     playerName: string;
+    notifications: NotificationRow[];
+    unreadCount: number;
+    onMarkNotificationRead: (id: string) => void;
+    onMarkAllNotificationsRead: () => void;
     onToggleSidebar: () => void;
     onLogout: () => void;
 }
 
-function Topbar({ level, streakDays, coins, playerName, onToggleSidebar, onLogout }: TopbarProps) {
+function Topbar({
+    level,
+    streakDays,
+    coins,
+    playerName,
+    notifications,
+    unreadCount,
+    onMarkNotificationRead,
+    onMarkAllNotificationsRead,
+    onToggleSidebar,
+    onLogout
+}: TopbarProps) {
     const initial = playerName.trim().charAt(0).toUpperCase() || "?";
 
     return (
@@ -33,6 +50,13 @@ function Topbar({ level, streakDays, coins, playerName, onToggleSidebar, onLogou
                 <CoinBalance coins={coins} />
 
                 <span className="topbar-stat topbar-stat--level">LVL {level}</span>
+
+                <NotificationBell
+                    notifications={notifications}
+                    unreadCount={unreadCount}
+                    onMarkRead={onMarkNotificationRead}
+                    onMarkAllRead={onMarkAllNotificationsRead}
+                />
 
                 <Link to="/profile" className="topbar-avatar" aria-label={`Ver perfil de ${playerName}`}>
                     {initial}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { CompleteMissionResult, Mission, UserMission } from "../services/missionService";
+import type { CompleteMissionResult, Mission, NewMissionInput, UserMission } from "../services/missionService";
 import {
     completeMission as completeMissionRequest,
     createCustomMission,
@@ -7,16 +7,16 @@ import {
     fetchMissions,
     fetchUserMissions
 } from "../services/missionService";
-import { toDateKey } from "../systems/date";
+import { startOfWeek, toDateKey } from "../systems/date";
 
 interface UseMissionsResult {
     missions: Mission[];
     userMissions: UserMission[];
     loading: boolean;
     error: string | null;
-    isCompletedToday: (missionId: string) => boolean;
+    isCompletedInCurrentPeriod: (missionId: string) => boolean;
     completeMission: (missionId: string) => Promise<CompleteMissionResult>;
-    addCustomMission: (ownerUserId: string, title: string, stat: string) => Promise<void>;
+    addCustomMission: (ownerUserId: string, input: NewMissionInput) => Promise<void>;
     removeCustomMission: (missionId: string) => Promise<void>;
 }
 
@@ -71,17 +71,40 @@ export function useMissions(userId: string | null): UseMissionsResult {
         };
     }, [userId]);
 
-    function isCompletedToday(missionId: string): boolean {
+    // Refleja si el período de repetición actual de la misión ya se completó
+    // (día/semana/mes local, o "alguna vez" para once/challenge) — solo para
+    // deshabilitar el botón al instante; la fuente de verdad real es
+    // complete_mission() en Supabase, que decide con el mismo criterio.
+    function isCompletedInCurrentPeriod(missionId: string): boolean {
         const mission = missions.find((candidate) => candidate.id === missionId);
         if (!mission) {
             return false;
         }
 
-        if (mission.frequency === "once") {
+        if (mission.frequency === "once" || mission.frequency === "challenge") {
             return userMissions.some((entry) => entry.mission_id === missionId);
         }
 
-        const todayKey = toDateKey(new Date());
+        const now = new Date();
+
+        if (mission.frequency === "weekly") {
+            const currentWeekStart = startOfWeek(now);
+            return userMissions.some(
+                (entry) => entry.mission_id === missionId && startOfWeek(new Date(entry.completed_at)) === currentWeekStart
+            );
+        }
+
+        if (mission.frequency === "monthly") {
+            return userMissions.some((entry) => {
+                if (entry.mission_id !== missionId) {
+                    return false;
+                }
+                const completedDate = new Date(entry.completed_at);
+                return completedDate.getFullYear() === now.getFullYear() && completedDate.getMonth() === now.getMonth();
+            });
+        }
+
+        const todayKey = toDateKey(now);
         return userMissions.some(
             (entry) => entry.mission_id === missionId && toDateKey(new Date(entry.completed_at)) === todayKey
         );
@@ -103,8 +126,8 @@ export function useMissions(userId: string | null): UseMissionsResult {
         return result;
     }
 
-    async function addCustomMission(ownerUserId: string, title: string, stat: string) {
-        const mission = await createCustomMission(ownerUserId, title, stat);
+    async function addCustomMission(ownerUserId: string, input: NewMissionInput) {
+        const mission = await createCustomMission(ownerUserId, input);
         setMissions((prev) => [...prev, mission]);
     }
 
@@ -118,7 +141,7 @@ export function useMissions(userId: string | null): UseMissionsResult {
         userMissions,
         loading,
         error,
-        isCompletedToday,
+        isCompletedInCurrentPeriod,
         completeMission,
         addCustomMission,
         removeCustomMission

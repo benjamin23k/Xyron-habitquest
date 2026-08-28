@@ -57,7 +57,7 @@ function AttributeFormModal({ title, submitLabel, initialValues, onSubmit, onClo
 
     return (
         <Modal title={title} onClose={onClose}>
-            <form onSubmit={handleSubmit} className="attribute-form">
+            <form onSubmit={handleSubmit} className="stacked-form">
                 <label htmlFor="attribute-name">Nombre</label>
                 <input
                     id="attribute-name"
@@ -77,7 +77,7 @@ function AttributeFormModal({ title, submitLabel, initialValues, onSubmit, onClo
                     rows={3}
                 />
 
-                <span className="attribute-form-label">Icono</span>
+                <span className="stacked-form-label">Icono</span>
                 <div className="icon-picker" role="radiogroup" aria-label="Icono del atributo">
                     {ATTRIBUTE_ICON_OPTIONS.map((option) => (
                         <button

@@ -1,22 +1,48 @@
+import { useState } from "react";
+import type { ChangeEvent } from "react";
 import { Fire } from "@phosphor-icons/react";
 import { useDashboardContext } from "../hooks/useDashboardContext";
 import ProgressBar from "../components/ui/ProgressBar";
 import CoinBalance from "../components/ui/CoinBalance";
 import Badge from "../components/ui/Badge";
 import IconGlyph from "../components/ui/IconGlyph";
-import AchievementCard from "../components/achievements/AchievementCard";
-import achievementsList from "../data/achievements";
+import RecentAchievements from "../components/achievements/RecentAchievements";
 import { getRankForLevel } from "../systems/rank";
 
 function ProfilePage() {
-    const { profile, progression, streak, stats, unlockedAchievementIds } = useDashboardContext();
+    const {
+        profile,
+        progression,
+        streak,
+        stats,
+        achievements,
+        userAchievements,
+        titles,
+        unlockedTitleIds,
+        editProfile
+    } = useDashboardContext();
+
+    const [titleError, setTitleError] = useState<string | null>(null);
+    const [savingTitle, setSavingTitle] = useState(false);
+
     const rank = getRankForLevel(progression.level);
     const initial = profile.name.trim().charAt(0).toUpperCase() || "?";
+    const activeTitle = titles.find((title) => title.id === profile.active_title_id);
+    const unlockedTitles = titles.filter((title) => unlockedTitleIds.has(title.id));
 
-    const recentAchievements = achievementsList
-        .filter((achievement) => unlockedAchievementIds.includes(achievement.id))
-        .slice(-3)
-        .reverse();
+    async function handleTitleChange(event: ChangeEvent<HTMLSelectElement>) {
+        const value = event.target.value;
+        setTitleError(null);
+        setSavingTitle(true);
+
+        try {
+            await editProfile({ active_title_id: value === "" ? null : value });
+        } catch (err) {
+            setTitleError(err instanceof Error ? err.message : "No se pudo cambiar el título.");
+        } finally {
+            setSavingTitle(false);
+        }
+    }
 
     return (
         <div className="page-stack">
@@ -26,6 +52,7 @@ function ProfilePage() {
                 </span>
                 <h1>{profile.name}</h1>
                 <p className="text-muted">@{profile.username}</p>
+                {activeTitle && <p className="profile-title">"{activeTitle.name}"</p>}
 
                 <div className="profile-header-tags">
                     <Badge variant="primary">Nivel {progression.level}</Badge>
@@ -55,6 +82,38 @@ function ProfilePage() {
             </section>
 
             <section className="card animate-in">
+                <h2>Título</h2>
+
+                {unlockedTitles.length > 0 ? (
+                    <>
+                        <label htmlFor="profile-title-select" className="sr-only">
+                            Elegir título activo
+                        </label>
+                        <select
+                            id="profile-title-select"
+                            value={profile.active_title_id ?? ""}
+                            onChange={handleTitleChange}
+                            disabled={savingTitle}
+                        >
+                            <option value="">Sin título</option>
+                            {unlockedTitles.map((title) => (
+                                <option key={title.id} value={title.id}>
+                                    {title.name}
+                                </option>
+                            ))}
+                        </select>
+                        {titleError && (
+                            <p className="auth-error" role="alert">
+                                {titleError}
+                            </p>
+                        )}
+                    </>
+                ) : (
+                    <p className="text-muted">Subí de nivel para desbloquear tu primer título.</p>
+                )}
+            </section>
+
+            <section className="card animate-in">
                 <h2>Resumen de atributos</h2>
                 <ul className="profile-attribute-summary">
                     {stats.map((stat) => (
@@ -70,16 +129,7 @@ function ProfilePage() {
 
             <section className="card animate-in">
                 <h2>Logros recientes</h2>
-
-                {recentAchievements.length > 0 ? (
-                    <ul className="achievement-grid">
-                        {recentAchievements.map((achievement) => (
-                            <AchievementCard key={achievement.id} achievement={achievement} isUnlocked />
-                        ))}
-                    </ul>
-                ) : (
-                    <p className="text-muted">Todavía no desbloqueaste logros.</p>
-                )}
+                <RecentAchievements achievements={achievements} userAchievements={userAchievements} />
             </section>
         </div>
     );

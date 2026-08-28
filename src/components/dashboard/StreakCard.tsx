@@ -12,7 +12,7 @@ const MESSAGES: { min: number; text: string }[] = [
     { min: 7, text: "Estás en llamas." },
     { min: 3, text: "Vas agarrando ritmo." },
     { min: 1, text: "Arrancaste — no aflojes." },
-    { min: 0, text: "Completá una misión hoy para empezar tu racha." }
+    { min: 0, text: "Completá una misión o hábito hoy para empezar tu racha." }
 ];
 
 function getMessage(current: number): string {

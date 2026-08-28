@@ -10,6 +10,8 @@ export interface Profile {
     coins: number;
     rank: string;
     membership: string;
+    active_title_id: string | null;
+    timezone_offset_minutes: number;
     created_at: string;
 }
 
@@ -53,6 +55,8 @@ export interface ProfileUpdate {
     name?: string;
     username?: string;
     avatar_url?: string;
+    active_title_id?: string | null;
+    timezone_offset_minutes?: number;
 }
 
 export async function updateProfile(userId: string, updates: ProfileUpdate): Promise<Profile> {
@@ -66,6 +70,12 @@ export async function updateProfile(userId: string, updates: ProfileUpdate): Pro
         .single();
 
     if (error) {
+        // 42501 = row-level security violation: pasa si se intenta activar un
+        // título que el usuario todavía no desbloqueó (ver policy
+        // "profiles_update_own" en supabase/migrations/0004_progression_foundation.sql).
+        if (error.code === "42501") {
+            throw new Error("Todavía no desbloqueaste ese título.");
+        }
         throw error;
     }
 

@@ -1,15 +1,27 @@
 import { useState } from "react";
 import { CaretLeft, CaretRight } from "@phosphor-icons/react";
 import type { Mission, UserMission } from "../../services/missionService";
+import type { Habit, HabitCompletion } from "../../services/habitService";
+import type { PomodoroSession } from "../../services/pomodoroService";
 import { getMonthMatrix } from "../../systems/calendar";
 import { toDateKey } from "../../systems/date";
-import { computeDailyActivity, getActivityLevel } from "../../systems/calendarStats";
+import {
+    computeAverageXpPerDay,
+    computeCompletionRate,
+    computeDailyActivity,
+    countActiveDays,
+    getActivityLevel
+} from "../../systems/calendarStats";
 import { computeStreakFromDates } from "../../systems/streak";
 import Button from "../ui/Button";
 
 interface ProgressCalendarProps {
     missions: Mission[];
     userMissions: UserMission[];
+    pomodoroSessions: PomodoroSession[];
+    habits: Habit[];
+    habitCompletions: HabitCompletion[];
+    accountCreatedAt: string;
 }
 
 const WEEKDAY_LABELS = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
@@ -30,18 +42,25 @@ function capitalize(text: string): string {
     return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
-function ProgressCalendar({ missions, userMissions }: ProgressCalendarProps) {
+function ProgressCalendar({
+    missions,
+    userMissions,
+    pomodoroSessions,
+    habits,
+    habitCompletions,
+    accountCreatedAt
+}: ProgressCalendarProps) {
     const today = new Date();
     const todayKey = toDateKey(today);
 
     const [viewDate, setViewDate] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1));
     const [selectedDateKey, setSelectedDateKey] = useState(todayKey);
 
-    const activityByDate = computeDailyActivity(missions, userMissions);
+    const activityByDate = computeDailyActivity(missions, userMissions, pomodoroSessions, habits, habitCompletions);
     const weeks = getMonthMatrix(viewDate.getFullYear(), viewDate.getMonth());
     const monthLabel = capitalize(viewDate.toLocaleDateString("es-ES", { month: "long", year: "numeric" }));
 
-    const selectedActivity = activityByDate[selectedDateKey] ?? { count: 0, xp: 0, coins: 0 };
+    const selectedActivity = activityByDate[selectedDateKey] ?? { count: 0, xp: 0, coins: 0, focusMinutes: 0 };
     const selectedLabel = capitalize(
         new Date(`${selectedDateKey}T00:00:00`).toLocaleDateString("es-ES", {
             weekday: "long",
@@ -61,13 +80,17 @@ function ProgressCalendar({ missions, userMissions }: ProgressCalendarProps) {
             if (activity) {
                 acc.xp += activity.xp;
                 acc.missions += activity.count;
+                acc.focusMinutes += activity.focusMinutes;
             }
             return acc;
         },
-        { xp: 0, missions: 0 }
+        { xp: 0, missions: 0, focusMinutes: 0 }
     );
 
     const bestStreak = computeStreakFromDates(Object.keys(activityByDate)).longest;
+    const activeDays = countActiveDays(activityByDate);
+    const avgXpPerDay = computeAverageXpPerDay(activityByDate);
+    const completionRate = computeCompletionRate(activityByDate, new Date(accountCreatedAt));
 
     function goToPreviousMonth() {
         setViewDate((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
@@ -112,7 +135,7 @@ function ProgressCalendar({ missions, userMissions }: ProgressCalendarProps) {
                                     }
 
                                     const activity = activityByDate[day.dateKey];
-                                    const level = getActivityLevel(activity?.count ?? 0);
+                                    const level = getActivityLevel(activity?.xp ?? 0);
                                     const isSelected = day.dateKey === selectedDateKey;
                                     const isToday = day.dateKey === todayKey;
 
@@ -132,7 +155,7 @@ function ProgressCalendar({ missions, userMissions }: ProgressCalendarProps) {
                                                 onClick={() => setSelectedDateKey(day.dateKey)}
                                                 aria-pressed={isSelected}
                                                 aria-current={isToday ? "date" : undefined}
-                                                aria-label={`${day.date.getDate()} — ${activity?.count ?? 0} misiones completadas`}
+                                                aria-label={`${day.date.getDate()} — ${activity?.count ?? 0} actividades completadas`}
                                                 className={className}
                                             >
                                                 {day.date.getDate()}
@@ -158,11 +181,12 @@ function ProgressCalendar({ missions, userMissions }: ProgressCalendarProps) {
             <div className="calendar-detail">
                 <h3>{selectedLabel}</h3>
 
-                {selectedActivity.count > 0 ? (
+                {selectedActivity.count > 0 || selectedActivity.focusMinutes > 0 ? (
                     <>
                         <p>
-                            {selectedActivity.count} {selectedActivity.count === 1 ? "misión" : "misiones"} · +
+                            {selectedActivity.count} {selectedActivity.count === 1 ? "actividad" : "actividades"} · +
                             {selectedActivity.xp} XP · +{selectedActivity.coins} XYR
+                            {selectedActivity.focusMinutes > 0 && ` · ${selectedActivity.focusMinutes} min de foco`}
                         </p>
                         <p className="text-muted">{getDayQuality(selectedActivity.count)}</p>
                     </>
@@ -177,7 +201,7 @@ function ProgressCalendar({ missions, userMissions }: ProgressCalendarProps) {
                     <span className="calendar-stats-value">{monthTotals.xp}</span>
                 </div>
                 <div>
-                    <span className="eyebrow">Misiones del mes</span>
+                    <span className="eyebrow">Actividades del mes</span>
                     <span className="calendar-stats-value">{monthTotals.missions}</span>
                 </div>
                 <div>
@@ -185,6 +209,18 @@ function ProgressCalendar({ missions, userMissions }: ProgressCalendarProps) {
                     <span className="calendar-stats-value">
                         {bestStreak} {bestStreak === 1 ? "día" : "días"}
                     </span>
+                </div>
+                <div>
+                    <span className="eyebrow">Días activos</span>
+                    <span className="calendar-stats-value">{activeDays}</span>
+                </div>
+                <div>
+                    <span className="eyebrow">XP promedio/día</span>
+                    <span className="calendar-stats-value">{avgXpPerDay}</span>
+                </div>
+                <div>
+                    <span className="eyebrow">Consistencia</span>
+                    <span className="calendar-stats-value">{completionRate}%</span>
                 </div>
             </div>
         </div>
